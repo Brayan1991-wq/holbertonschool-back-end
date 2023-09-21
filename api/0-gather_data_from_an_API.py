@@ -25,6 +25,7 @@ if len(sys.argv) != 2:
     # Mostrar información del progreso en el formato especificado
     print(f"Employee {employee_name} is done with tasks ({completed_tasks}/{total_tasks}):")
     for todo in todos_data:
-        if todo.get("completed"):
-            print(f"\t{todo.get('title')}")
-            
+        completed = todo.get("completed")
+        title = todo.get("title")
+        task_line = "\t" + title if completed else title
+        print(task_line)
