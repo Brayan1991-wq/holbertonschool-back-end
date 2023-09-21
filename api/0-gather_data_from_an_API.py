@@ -1,23 +1,30 @@
 #!/usr/bin/python3
-"""Python script that using REST API"""
 import requests
 import sys
 
-if __name__ == "__main__":
-    user_id = sys.argv[1]
-    todo_url = f"https://jsonplaceholder.typicode.com/todos?userId={user_id}"
-    user_url = f"https://jsonplaceholder.typicode.com/users/{user_id}"
+if len(sys.argv) != 2:
+    print("Uso: python todo_progress.py <ID_empleado>")
+    sys.exit(1)
     
-    response1 = requests.get(todo_url).json()
-    response2 = requests.get(user_url).json()
+    employee_id = int(sys.argv[1])
+    base_url = "https://jsonplaceholder.typicode.com"
     
-    number_tasks_done = sum(1 for task in response1 if task["completed"])
-    total_tasks = len(response1)
+    # Obtener información del empleado
+    employee_response = requests.get(f"{base_url}/users/{employee_id}")
+    employee_data = employee_response.json()
+    employee_name = employee_data.get("name")
     
-    employee_name = response2.get("name")
-    task_titles = [task["title"] for task in response1 if task["completed"]]
+    # Obtener la lista de tareas TODO del empleado
+    todos_response = requests.get(f"{base_url}/todos?userId={employee_id}")
+    todos_data = todos_response.json()
     
-    print("Employee {} is done with tasks({}/{}):".format(
-        employee_name, number_tasks_done, total_tasks))
-    for title in task_titles:
-        print(f"\t {title}")
+    # Calcular el progreso de la lista de tareas TODO
+    total_tasks = len(todos_data)
+    completed_tasks = sum(1 for todo in todos_data if todo.get("completed"))
+    
+    # Mostrar información del progreso en el formato especificado
+    print(f"Employee {employee_name} is done with tasks ({completed_tasks}/{total_tasks}):")
+    for todo in todos_data:
+        if todo.get("completed"):
+            print(f"\t{todo.get('title')}")
+            
